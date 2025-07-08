@@ -4,6 +4,7 @@ import {
   AppBar, Toolbar, Chip, Badge, IconButton,
   Alert, Breadcrumbs, Link, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
+
 import EditIcon from '@mui/icons-material/Edit';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -20,7 +21,66 @@ import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { TABLES } from '../constants/plastique';
 import { isCalculated, getCalculation } from '../utils/plastique/calculations';
 import { generateWordReport, downloadBlob } from '../utils/plastique/wordExport';
+import { complets, directs, cout_machine } from '../utils/plastique/variables';
 import PlastiqueDirectCostCalculatorDialog from './PlastiqueDirectCostCalculatorDialog';
+
+const DROPDOWN_OPTIONS = {
+  lancementMoulage: {
+    'TYPE DE PRESSE': [
+      { label: 'Petite (50T)', value: 23 },
+      { label: 'Moyenne (51T à 219T)', value: 28 },
+      { label: 'Grosse (220T à 485T)', value: 35 }
+    ]
+  },
+  finition: {
+    'Ressource lancement': [
+      { label: 'operateur', value: complets.coutHoraire.operateur },
+      { label: 'regleur', value: complets.coutHoraire.regleur },
+      { label: 'finition', value: complets.coutHoraire.finition }
+    ],
+    'Ressource production': [
+      { label: 'operateur', value: complets.coutHoraire.operateur },
+      { label: 'regleur', value: complets.coutHoraire.regleur },
+      { label: 'finition', value: complets.coutHoraire.finition }
+    ]
+  },
+  controleCapa: {
+    'Ressource lancement': [
+      { label: 'operateur', value: complets.coutHoraire.operateur },
+      { label: 'regleur', value: complets.coutHoraire.regleur },
+      { label: 'finition', value: complets.coutHoraire.finition }
+    ],
+    'Ressource production': [
+      { label: 'operateur', value: complets.coutHoraire.operateur },
+      { label: 'regleur', value: complets.coutHoraire.regleur },
+      { label: 'finition', value: complets.coutHoraire.finition }
+    ]
+  },
+  embalage: {
+    'Ressource lancement': [
+      { label: 'operateur', value: complets.coutHoraire.operateur },
+      { label: 'regleur', value: complets.coutHoraire.regleur },
+      { label: 'finition', value: complets.coutHoraire.finition }
+    ],
+    'Ressource production': [
+      { label: 'operateur', value: complets.coutHoraire.operateur },
+      { label: 'regleur', value: complets.coutHoraire.regleur },
+      { label: 'finition', value: complets.coutHoraire.finition }
+    ]
+  },
+  autre: {
+    'Ressource lancement': [
+      { label: 'operateur', value: complets.coutHoraire.operateur },
+      { label: 'regleur', value: complets.coutHoraire.regleur },
+      { label: 'finition', value: complets.coutHoraire.finition }
+    ],
+    'Ressource production': [
+      { label: 'operateur', value: complets.coutHoraire.operateur },
+      { label: 'regleur', value: complets.coutHoraire.regleur },
+      { label: 'finition', value: complets.coutHoraire.finition }
+    ]
+  }
+};
 
 const initData = (columns) => {
   const initial = {};
@@ -87,6 +147,10 @@ const PlastiqueTables = () => {
 
   const isRedField = useCallback((table, header) => {
     return isCalculated(table, header);
+  }, []);
+
+  const hasDropdown = useCallback((table, header) => {
+    return Boolean(DROPDOWN_OPTIONS[table]?.[header]);
   }, []);
 
   const autoPopulateFields = useCallback((currentData) => {
@@ -528,7 +592,26 @@ const PlastiqueTables = () => {
                 {headers.map(header => (
                   <tr key={header}>
                     <td style={{ fontWeight: 'bold', backgroundColor: '#fafafa', padding: 8 }}>
-                      {header}
+                      {hasDropdown(key, header) ? (
+                        <FormControl fullWidth size="small">
+                          <InputLabel>{header}</InputLabel>
+                          <Select
+                            value={data[0]?.[key]?.[header] || ''}
+                            onChange={e => {
+                              const newData = { ...data };
+                              for (let col = 0; col < valueColumns; col++) {
+                                newData[col][key][header] = e.target.value;
+                              }
+                              setData(newData);
+                            }}
+                            label={header}
+                          >
+                            {DROPDOWN_OPTIONS[key][header].map(({ label, value }) => (
+                              <MenuItem key={label} value={value}>{label}</MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      ) : header}
                     </td>
                     {Array.from({ length: valueColumns }).map((_, colIdx) => (
                       <TableCellMemo
