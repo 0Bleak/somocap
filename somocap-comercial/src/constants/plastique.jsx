@@ -9,20 +9,20 @@ export const MATIERE_HEADERS = [
   'Prix Colorant (€/kg)',
   'Volume (cm3)',
   'Densité (gr/cm3)',
-  'Poids pièce (gr)', // CALCULATED
+  'Poids pièce (gr)', 
   'Poids carotte de la moulée (gr)',
-  'Poids carotte/ pièce (gr)', // CALCULATED
-  '% du masse carotte / masse pièce', // CALCULATED
+  'Poids carotte/ pièce (gr)', // First occurrence
+  '% du masse carotte / masse pièce', 
   '% de recyclage carotte integrer',
-  '% du masse carotte / masse pièce apres recyclage (< 15%)', // CALCULATED
-  'Poids carotte/ pièce (gr)', // CALCULATED (duplicate field)
+  '% du masse carotte / masse pièce apres recyclage (< 15%)', 
+  'Poids carotte/ pièce (gr)_2', // Second occurrence with _2 suffix
   'Poids purge nettoyage lancement série (gr)',
   'Quantité rebuts/lancement',
-  'Poids rebuts (gr)', // CALCULATED
-  'Poids purge (g)', // CALCULATED
-  'Poids Nomenclature SQUALP', // CALCULATED
-  'Pour info cout carotte (€):', // CALCULATED
-  'COUT MATIERE PAR PIECE' // CALCULATED
+  'Poids rebuts (gr)', 
+  'Poids purge (g)', 
+  'Poids Nomenclature SQUALP', 
+  'Pour info cout carotte (€):', 
+  'COUT MATIERE PAR PIECE'
 ];
 
 export const INSERTS_HEADERS = [
@@ -30,10 +30,10 @@ export const INSERTS_HEADERS = [
   'Coût insert',
   'Nombre d\'insert par pièce',
   'Contrôle insert',
-  'Quantité d\'inserts lancement', // CALCULATED
-  'Quantité inserts rebuts production', // CALCULATED
-  'Quantité totale inserts', // CALCULATED
-  'COUT INSERTS PAR PIECE' // CALCULATED
+  'Quantité d\'inserts lancement', 
+  'Quantité inserts rebuts production', 
+  'Quantité totale inserts',
+  'COUT INSERTS PAR PIECE' 
 ];
 
 export const CONDITIONNEMENT_HEADERS = [
@@ -41,15 +41,15 @@ export const CONDITIONNEMENT_HEADERS = [
   'Longueur pièce (en X)',
   'Largeur pièce (en Y)',
   'Hauteur pièce (en Z)',
-  'Nbre de pièce en Longueur', // CALCULATED
-  'Nbre de pièce en Largeur', // CALCULATED
-  'Nbre de pièce en Hauteur', // CALCULATED
-  'Volume (cm3)', // CALCULATED
-  'Quantité de pièce par conditionnement', // CALCULATED
+  'Nbre de pièce en Longueur', 
+  'Nbre de pièce en Largeur', 
+  'Nbre de pièce en Hauteur', 
+  'Volume (cm3)', 
+  'Quantité de pièce par conditionnement', 
   'Coût du conditionnement (carton, sachet)',
   'Coût palette',
   'Nombre de conditionnement par palette',
-  'COUT CONDITIONNEMENT PAR PIECE' // CALCULATED
+  'COUT CONDITIONNEMENT PAR PIECE' 
 ];
 
 export const AUTRES_ACHATS_HEADERS = [
@@ -57,21 +57,21 @@ export const AUTRES_ACHATS_HEADERS = [
 ];
 
 export const TOTAL_ACHATS_HEADERS = [
-  'COÛTS TOTAL ACHAT', // CALCULATED
-  '% ACHAT/CA' // CALCULATED
+  'COÛTS TOTAL ACHAT', // 
+  '% ACHAT/CA' // 
 ];
 
 export const LANCEMENT_MOULAGE_HEADERS = [
   'SERIE DE PIECES',
-  'TYPE DE PRESSE', // DROPDOWN
+  'TYPE DE PRESSE', // 
   'PREPARATION AU POSTE',
   'PREPARATION MATIERE',
   'NETTOYAGE TREMIE (HORS PRESSE)',
   'PREPARATION & STOCKAGE MOULE (HORS PRESSE) (MIN)',
   'MONTAGE & DEMONTAGE (MIN) - MONTEUR OUTILLAGE',
   'LANCEMENT (MIN) - REGLEUR',
-  'COUT LANCEMENT TOTAL', // CALCULATED
-  'COUT LANCEMENT/PIECE' // CALCULATED
+  'COUT LANCEMENT TOTAL', // 
+  'COUT LANCEMENT/PIECE' // 
 ];
 
 export const MOULAGE_HEADERS = [
@@ -79,22 +79,22 @@ export const MOULAGE_HEADERS = [
   "NOMBRE D'EMPREINTES",
   'MOULAGE AUTO : 25% ; SEMI-AUTO : 100%',
   '% DE REBUT MOULAGE',
-  'QUANTITE DE PIECE PAR EQUIPE', // CALCULATED
-  "Nombre d'équipe pour la série", // CALCULATED
-  'COÛT MOULAGE/PIECE', // CALCULATED
-  'Total moulage' // CALCULATED
+  'QUANTITE DE PIECE PAR EQUIPE', // 
+  "Nombre d'équipe pour la série", // 
+  'COÛT MOULAGE/PIECE', // 
+  'Total moulage' // 
 ];
 
 export const FINITION_HEADERS = [
   'Série de pièces à traiter',
   'Temps prépration poste (min)',
-  'Ressource lancement', // DROPDOWN
+  'Ressource lancement', // 
   'Côuts horaire équipement',
-  'Coût lancement ramené à la pièce', // CALCULATED
-  'Ressource production', // DROPDOWN
+  'Coût lancement ramené à la pièce', // 
+  'Ressource production', // 
   'Temps par pièce (s)',
-  'Coûts opération par pièce', // CALCULATED
-  'COUT FINITION PAR PIECE' // CALCULATED
+  'Coûts opération par pièce', // 
+  'COUT FINITION PAR PIECE' // 
 ];
 
 export const CONTROLE_CAPA_HEADERS = [

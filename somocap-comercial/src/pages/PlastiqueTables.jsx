@@ -103,11 +103,16 @@ const TableCellMemo = React.memo(({ colIdx, keyName, header, value, onChange, is
       fullWidth
       value={value}
       onChange={e => onChange(colIdx, keyName, header, e.target.value)}
+      disabled={isRed}
       sx={{
         backgroundColor: isRed ? '#ffe6e6' : undefined,
         '& .MuiInputBase-input': {
           fontWeight: isRed ? 'bold' : undefined,
-          color: isRed ? '#d32f2f' : undefined
+          color: isRed ? '#d32f2f' : undefined,
+        },
+        '& .Mui-disabled': {
+          color: '#d32f2f !important',
+          WebkitTextFillColor: '#d32f2f !important',
         }
       }}
     />
@@ -206,33 +211,46 @@ const PlastiqueTables = () => {
     }
   }, [data, columnNames, valueColumns, images, isRedField, documentName]);
 
-  const calculateAllValuesForColumn = useCallback((columnIndex, currentData) => {
-    const newData = JSON.parse(JSON.stringify(currentData));
-    const calculationOrder = ['matiere', 'inserts'];
-
-    calculationOrder.forEach(tableKey => {
-      const table = TABLES.find(t => t.key === tableKey);
-      if (!table) return;
-      table.headers.forEach(header => {
-        if (isCalculated(tableKey, header)) {
-          const calc = getCalculation(tableKey, header);
-          if (calc) {
-            try {
-              const allData = newData[columnIndex];
-              const tableData = allData[tableKey];
-              const result = calc(tableData, allData);
-              newData[columnIndex][tableKey][header] = result;
-            } catch (e) {
-              console.error(`Calc error: ${tableKey}.${header}`, e);
-            }
+const calculateAllValuesForColumn = useCallback((columnIndex, currentData) => {
+  const newData = JSON.parse(JSON.stringify(currentData));
+  
+  // Calculate in proper order - all tables
+  TABLES.forEach(({ key }) => {
+    const table = TABLES.find(t => t.key === key);
+    if (!table) return;
+    
+    // Special handling for duplicate field names
+    let duplicateCount = {};
+    
+    table.headers.forEach((header, headerIndex) => {
+      // Track duplicate headers
+      if (!duplicateCount[header]) {
+        duplicateCount[header] = 0;
+      } else {
+        duplicateCount[header]++;
+      }
+      
+      // Generate unique key for duplicate headers
+      const uniqueKey = duplicateCount[header] > 0 ? `${header}_${duplicateCount[header] + 1}` : header;
+      
+      if (isCalculated(key, header)) {
+        const calc = getCalculation(key, uniqueKey) || getCalculation(key, header);
+        if (calc) {
+          try {
+            const allData = newData[columnIndex];
+            const tableData = allData[key];
+            const result = calc(tableData, allData);
+            newData[columnIndex][key][uniqueKey] = result;
+          } catch (e) {
+            console.error(`Calc error: ${key}.${header}`, e);
           }
         }
-      });
+      }
     });
+  });
 
-    return newData;
-  }, []);
-
+  return newData;
+}, []);
   const handleOpenDirectCostDialog = (columnIndex) => {
     setSelectedColumnForDirectCost(columnIndex);
     setDirectCostDialogOpen(true);
@@ -573,7 +591,7 @@ const PlastiqueTables = () => {
             key={key}
             ref={tableRefs.current[key]}
             variant="outlined"
-            sx={{ mt: 15, mb: 3, p: 2, backgroundColor: bgColor, borderColor }}
+            sx={{ mt: 3, mb: 3, p: 2, backgroundColor: bgColor, borderColor }}
           >
             <Typography variant="h6" sx={{ color: textColor, mb: 1, display: 'flex', alignItems: 'center' }}>
               <span style={{ marginRight: 8 }}>{icon}</span>{title}
@@ -588,45 +606,66 @@ const PlastiqueTables = () => {
                   ))}
                 </tr>
               </thead>
-              <tbody>
-                {headers.map(header => (
-                  <tr key={header}>
-                    <td style={{ fontWeight: 'bold', backgroundColor: '#fafafa', padding: 8 }}>
-                      {hasDropdown(key, header) ? (
-                        <FormControl fullWidth size="small">
-                          <InputLabel>{header}</InputLabel>
-                          <Select
-                            value={data[0]?.[key]?.[header] || ''}
-                            onChange={e => {
-                              const newData = { ...data };
-                              for (let col = 0; col < valueColumns; col++) {
-                                newData[col][key][header] = e.target.value;
-                              }
-                              setData(newData);
-                            }}
-                            label={header}
-                          >
-                            {DROPDOWN_OPTIONS[key][header].map(({ label, value }) => (
-                              <MenuItem key={label} value={value}>{label}</MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      ) : header}
-                    </td>
-                    {Array.from({ length: valueColumns }).map((_, colIdx) => (
-                      <TableCellMemo
-                        key={colIdx}
-                        colIdx={colIdx}
-                        keyName={key}
-                        header={header}
-                        value={data[colIdx]?.[key]?.[header] || ''}
-                        onChange={updateCell}
-                        isRed={isRedField(key, header)}
-                      />
-                    ))}
-                  </tr>
+
+                  <tbody>
+  {headers.map((header, headerIndex) => {
+    const isRed = isRedField(key, header);
+    const dropdown = hasDropdown(key, header);
+    
+    // Count occurrences of this header name up to current index
+    let occurrenceIndex = 0;
+    let duplicateHeaders = {};
+    for (let i = 0; i <= headerIndex; i++) {
+      if (headers[i] === header) {
+        if (i < headerIndex) {
+          occurrenceIndex++;
+        }
+        duplicateHeaders[headers[i]] = (duplicateHeaders[headers[i]] || 0) + 1;
+      }
+    }
+    
+    // Generate unique key for duplicate headers
+    const uniqueKey = occurrenceIndex > 0 ? `${header}_${occurrenceIndex + 1}` : header;
+    
+    return (
+      <tr key={`${header}-${headerIndex}`}>
+        <td style={{ fontWeight: 'bold', backgroundColor: '#fafafa', padding: 8 }}>
+          {dropdown ? (
+            <FormControl fullWidth size="small">
+              <InputLabel>{header}</InputLabel>
+              <Select
+                value={data[0]?.[key]?.[uniqueKey] || ''}
+                onChange={e => {
+                  const newData = { ...data };
+                  for (let col = 0; col < valueColumns; col++) {
+                    newData[col][key][uniqueKey] = e.target.value;
+                  }
+                  setData(newData);
+                }}
+                label={header}
+              >
+                {DROPDOWN_OPTIONS[key][header].map(({ label, value }) => (
+                  <MenuItem key={label} value={value}>{label}</MenuItem>
                 ))}
-              </tbody>
+              </Select>
+            </FormControl>
+          ) : header}
+        </td>
+        {Array.from({ length: valueColumns }).map((_, colIdx) => (
+          <TableCellMemo
+            key={colIdx}
+            colIdx={colIdx}
+            keyName={key}
+            header={uniqueKey}
+            value={data[colIdx]?.[key]?.[uniqueKey] || ''}
+            onChange={updateCell}
+            isRed={isRed}
+          />
+        ))}
+      </tr>
+    );
+  })}
+</tbody>
             </Box>
           </Paper>
         ))}
