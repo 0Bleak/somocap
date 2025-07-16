@@ -178,7 +178,7 @@
       "name": "plastique1",
       "type": "plastique",
       "createdAt": "2025-07-04T11:47:21.765Z",
-      "updatedAt": "2025-07-16T00:51:29.250Z",
+      "updatedAt": "2025-07-16T15:49:38.827Z",
       "valueColumns": 1,
       "columnNames": [
         "Valeur 1"
@@ -244,7 +244,7 @@
           },
           "totalAchats": {
             "COÛTS TOTAL ACHAT": "24.14",
-            "% ACHAT/CA": "76.02"
+            "% ACHAT/CA": "79.19"
           },
           "lancementMoulage": {
             "SERIE DE PIECES": "5200",
@@ -255,8 +255,8 @@
             "PREPARATION & STOCKAGE MOULE (HORS PRESSE) (MIN)": "1",
             "MONTAGE & DEMONTAGE (MIN) - MONTEUR OUTILLAGE": "95",
             "LANCEMENT (MIN) - REGLEUR": "60",
-            "COUT LANCEMENT TOTAL": "229.30",
-            "COUT LANCEMENT/PIECE": "0.04"
+            "COUT LANCEMENT TOTAL": "301.08",
+            "COUT LANCEMENT/PIECE": "0.06"
           },
           "moulage": {
             "TPS DE CYCLE (sec)": "95",
@@ -266,7 +266,7 @@
             "QUANTITE DE PIECE PAR EQUIPE": "493",
             "Nombre d'équipe pour la série": "10.5",
             "COÛT MOULAGE/PIECE": "0.438",
-            "Total moulage": "0.478"
+            "Total moulage": "0.498"
           },
           "finition": {
             "Série de pièces à traiter": "5200",
@@ -306,28 +306,28 @@
             "Temps prépration poste (min)": "2",
             "Ressource lancement": 35,
             "Côuts horaire équipement": "2",
-            "Coût lancement ramené à la pièce": "2.33",
+            "Coût lancement ramené à la pièce": "1.23",
             "Ressource production": 35,
             "Temps par pièce (s)": "2",
             "Coûts opération par pièce": "0.02",
-            "COUT FINITION PAR PIECE": "2.35"
+            "COUT FINITION PAR PIECE": "1.25"
           },
           "totalVA": {
-            "TOTAL VA": "2.851",
-            "PRI PIECE COUTS COMPLET": "26.99",
+            "TOTAL VA": "1.771",
+            "PRI PIECE COUTS COMPLET": "25.91",
             "PRI PIECE COUTS DIRECT": "25.39",
             "TAUX DE MARGE (PV/PRI coûts complet)": "15",
-            "PRIX DE VENTE": "31.753",
+            "PRIX DE VENTE": "30.482",
             "Option: PORT (Base de prix 35€ / palette)": "0.00",
-            "MARGE SUR COUTS DIRECTS €": "6.36",
-            "MARGE SUR COUTS DIRECTS %": "20.04"
+            "MARGE SUR COUTS DIRECTS €": "5.09",
+            "MARGE SUR COUTS DIRECTS %": "16.70"
           },
           "synthese": {
             "QUANTITE ANNUELLE": "5200",
             "NOMBRE D'EQUIPES ANNUEL": "11",
-            "CHIFFRE D'AFFAIRE PREVISIONNEL": "165116",
-            "MARGE SUR COUT COMPLET / AN": "24768",
-            "MARGE SUR COUT DIRECT / AN": "33072",
+            "CHIFFRE D'AFFAIRE PREVISIONNEL": "158506",
+            "MARGE SUR COUT COMPLET / AN": "23774",
+            "MARGE SUR COUT DIRECT / AN": "26468",
             "QUANTITE DE MATIERE PREVISIONNEL": "72",
             "CHARGE MACHINE": "2.13"
           }
@@ -526,7 +526,7 @@
       "name": "Cost Calculation Document",
       "type": "caoutchouc",
       "createdAt": "2023-01-01T00:00:00.000Z",
-      "updatedAt": "2025-07-15T10:20:58.293Z",
+      "updatedAt": "2025-07-16T15:48:37.767Z",
       "valueColumns": 1,
       "columnNames": [
         "1 MOQ 1"
