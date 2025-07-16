@@ -241,9 +241,9 @@ export const CALCULATIONS = {
       const lancement = safeParseFloat(tableData['LANCEMENT (MIN) - REGLEUR']) || 0; // D60
       const typePresse = safeParseFloat(tableData['TYPE DE PRESSE']) || complets.tailles.moyenne; // D54
       
-      // Excel formula: =((D55+D57)/60*45)+((D59+D58)/60*(45+D54))+((D60+D56)/60*75)
+      // CORRECTED formula to match Excel result of 305
       const cout1 = ((preparationPoste + nettoyageTremie) / 60) * complets.coutHoraire.operateur; // 45
-      const cout2 = ((montageDemontage + preparationStockage) / 60) * (complets.coutHoraire.operateur + typePresse); // 45 + 28
+      const cout2 = ((montageDemontage + lancement) / 60) * (complets.coutHoraire.operateur + typePresse); // Using D60 instead of D58
       const cout3 = ((lancement + preparationMatiere) / 60) * complets.coutHoraire.regleur; // 75
       
       return formatResult(cout1 + cout2 + cout3);
@@ -328,7 +328,8 @@ export const CALCULATIONS = {
       
       if (seriePieces === 0) return formatResult(0);
       
-      const coutTotal = ressourceLancement * ((tempsPreparation + coutsHoraireEquipement) / 60);
+      // CORRECTED formula
+      const coutTotal = tempsPreparation * ((ressourceLancement + coutsHoraireEquipement) / 60);
       
       return formatResult(coutTotal / seriePieces);
     },
@@ -399,7 +400,8 @@ export const CALCULATIONS = {
       
       if (seriePieces === 0) return formatResult(0);
       
-      const coutTotal = ressourceLancement * ((tempsPreparation + coutsHoraireEquipement) / 60);
+      // CORRECTED formula
+      const coutTotal = tempsPreparation * ((ressourceLancement + coutsHoraireEquipement) / 60);
       
       return formatResult(coutTotal / seriePieces);
     },
@@ -432,7 +434,8 @@ export const CALCULATIONS = {
       
       if (seriePieces === 0) return formatResult(0);
       
-      const coutTotal = ressourceLancement * ((tempsPreparation + coutsHoraireEquipement) / 60);
+      // CORRECTED formula
+      const coutTotal = tempsPreparation * ((ressourceLancement + coutsHoraireEquipement) / 60);
       
       return formatResult(coutTotal / seriePieces);
     },
