@@ -178,7 +178,7 @@
       "name": "plastique1",
       "type": "plastique",
       "createdAt": "2025-07-04T11:47:21.765Z",
-      "updatedAt": "2025-07-16T15:49:38.827Z",
+      "updatedAt": "2025-07-16T23:03:40.421Z",
       "valueColumns": 1,
       "columnNames": [
         "Valeur 1"
@@ -315,19 +315,19 @@
           "totalVA": {
             "TOTAL VA": "1.771",
             "PRI PIECE COUTS COMPLET": "25.91",
-            "PRI PIECE COUTS DIRECT": "25.39",
+            "PRI PIECE COUTS DIRECT": "25.38",
             "TAUX DE MARGE (PV/PRI coûts complet)": "15",
             "PRIX DE VENTE": "30.482",
             "Option: PORT (Base de prix 35€ / palette)": "0.00",
-            "MARGE SUR COUTS DIRECTS €": "5.09",
-            "MARGE SUR COUTS DIRECTS %": "16.70"
+            "MARGE SUR COUTS DIRECTS €": "5.10",
+            "MARGE SUR COUTS DIRECTS %": "16.74"
           },
           "synthese": {
             "QUANTITE ANNUELLE": "5200",
             "NOMBRE D'EQUIPES ANNUEL": "11",
             "CHIFFRE D'AFFAIRE PREVISIONNEL": "158506",
             "MARGE SUR COUT COMPLET / AN": "23774",
-            "MARGE SUR COUT DIRECT / AN": "26468",
+            "MARGE SUR COUT DIRECT / AN": "26520",
             "QUANTITE DE MATIERE PREVISIONNEL": "72",
             "CHARGE MACHINE": "2.13"
           }
