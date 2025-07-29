@@ -22,6 +22,7 @@ import { isCalculated, getCalculation } from '../utils/calculations';
 import { complets, directs, cout_machine } from '../utils/variables';
 import { generateWordReport, downloadBlob } from '../utils/wordExport';
 import DirectCostCalculatorDialog from '../pages/DirectCostCalculatorDialog';
+import ReportConfigDialog from './ReportConfigDialog';
 
 const DROPDOWN_OPTIONS = {
   ebauche: {
@@ -157,6 +158,7 @@ const FullTables = () => {
   const saveTimer = useRef(null);
   const tableRefs = useRef({});
   const imageInputRef = useRef(null);
+  const [reportConfigOpen, setReportConfigOpen] = useState(false);
 
   TABLES.forEach(({ key }) => {
     tableRefs.current[key] = useRef(null);
@@ -210,21 +212,24 @@ const FullTables = () => {
   const triggerImageUpload = useCallback(() => {
     imageInputRef.current?.click();
   }, []);
+const handleGenerateReport = useCallback(async (reportConfig) => {
+  setIsGenerating(true);
+  try {
+    const blob = await generateWordReport(data, columnNames, valueColumns, images, isRedField, reportConfig);
+    const filename = `proposition-${documentName}-indice-${reportConfig.indice}-${new Date().toISOString().split('T')[0]}.docx`;
+    downloadBlob(blob, filename);
+  } catch (error) {
+    console.error('Error generating Word document:', error);
+    alert('Erreur lors de la génération du document Word: ' + error.message);
+  } finally {
+    setIsGenerating(false);
+  }
+}, [data, columnNames, valueColumns, images, isRedField, documentName]);
 
-  const handleGenerateReport = useCallback(async () => {
-    setIsGenerating(true);
-    try {
-      const blob = await generateWordReport(data, columnNames, valueColumns, images, isRedField);
-      const filename = `rapport-${documentName}-${new Date().toISOString().split('T')[0]}.docx`;
-      downloadBlob(blob, filename);
-    } catch (error) {
-      console.error('Error generating Word document:', error);
-      alert('Erreur lors de la génération du document Word: ' + error.message);
-    } finally {
-      setIsGenerating(false);
-    }
-  }, [data, columnNames, valueColumns, images, isRedField, documentName]);
-
+// Update the generate report button click
+const openReportConfig = () => {
+  setReportConfigOpen(true);
+};
   const calculateAllValuesForColumn = useCallback((columnIndex, currentData) => {
     const newData = JSON.parse(JSON.stringify(currentData));
     const calculationOrder = [
@@ -531,15 +536,15 @@ const FullTables = () => {
               </Button>
             </Badge>
 
-            <Button 
-              onClick={handleGenerateReport} 
-              variant="contained" 
-              color="success" 
-              startIcon={<DownloadIcon />}
-              disabled={isGenerating}
-            >
-              {isGenerating ? 'Génération...' : 'Générer Rapport Word'}
-            </Button>
+         <Button 
+  onClick={openReportConfig} 
+  variant="contained" 
+  color="success" 
+  startIcon={<DownloadIcon />}
+  disabled={isGenerating}
+>
+  {isGenerating ? 'Génération...' : 'Générer Rapport Word'}
+</Button>
           </Box>
 
           {/* Navigation Chips */}
@@ -670,7 +675,14 @@ const FullTables = () => {
         mainData={data}
         columnIndex={selectedColumnForDirectCost}
       />
+      <ReportConfigDialog
+  open={reportConfigOpen}
+  onClose={() => setReportConfigOpen(false)}
+  onGenerate={handleGenerateReport}
+  documentName={documentName}
+/>
     </Box>
+    
   );
 };
 
