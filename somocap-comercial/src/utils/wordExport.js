@@ -1,5 +1,4 @@
-import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, TextRun, HeadingLevel, BorderStyle, ImageRun, Header } from 'docx';
-import { TABLES } from '../pages/constants'
+import { Document, Packer, Paragraph, Table, TableCell, TableRow, WidthType, AlignmentType, TextRun, HeadingLevel, BorderStyle, ImageRun, Header, Footer, PageBreak } from 'docx';
 
 export const generateWordReport = async (data, columnNames, valueColumns, images, isRedField, reportConfig) => {
   const {
@@ -10,15 +9,61 @@ export const generateWordReport = async (data, columnNames, valueColumns, images
     contactPhone,
     filename,
     indice,
-    logoImage
+    logoImage,
+    footerImage,
+    introductionText,
+    revisionComment,
+    revisionDate,
+    revisionVisa,
+    definitionSections = [],
+    presentationSections = [],
+    delaisItems = [],
+    reservesItems = [],
+    moq = '5 200pcs',
+    transportConditions = 'port dû',
+    seriesControl = 'Dimensionnel sur côtes majeures au lancement',
+    packaging = 'en vrac en carton D',
+    offerValidity = '2 mois',
+    toolingInvoicing = 'Facturation de 50% à la cde : Virement à réception de facture',
+    toolingBalance = 'Solde : 50% à la validation des EI Virement à réception de facture',
+    toolingDelay = 'Si délai de validation > 30 jours, la facture EI sera présentée à 30 jours après expédition des EI',
+    partsPayment = 'Virement à 30 jours date de facture',
+    partsTransport = 'Port dû',
+    signerName = '',
+    signerRole = ''
   } = reportConfig;
 
-  const syntheseTable = TABLES.find(t => t.key === 'synthese');
-  if (!syntheseTable) {
-    throw new Error('Synthese table not found');
-  }
+  // Create footer with image
+  const createFooter = () => {
+    if (!footerImage) return null;
+    
+    try {
+      return new Footer({
+        children: [
+          new Paragraph({
+            children: [
+              new ImageRun({
+                data: footerImage.buffer,
+                transformation: {
+                  width: 600,
+                  height: 80,
+                },
+              })
+            ],
+            alignment: AlignmentType.CENTER,
+            spacing: { before: 100, after: 100 }
+          })
+        ]
+      });
+    } catch (error) {
+      console.error('Error creating footer:', error);
+      return null;
+    }
+  };
 
-  // Create header for pages 2-4
+  const footer = createFooter();
+
+  // Create header for pages 2+
   const createHeader = () => {
     return new Header({
       children: [
@@ -54,7 +99,6 @@ export const generateWordReport = async (data, columnNames, valueColumns, images
   // First Page Content
   const firstPageContent = [];
 
-  // Add logo if provided (centered, reasonable size)
   if (logoImage) {
     try {
       const logoRun = new ImageRun({
@@ -69,22 +113,14 @@ export const generateWordReport = async (data, columnNames, valueColumns, images
         new Paragraph({
           children: [logoRun],
           alignment: AlignmentType.CENTER,
-          spacing: { before: 400, after: 400 }
+          spacing: { before: 400, after: 600 }
         })
       );
     } catch (error) {
       console.error('Error adding logo:', error);
     }
-  } else {
-    firstPageContent.push(
-      new Paragraph({
-        children: [new TextRun({ text: "" })],
-        spacing: { before: 600, after: 400 }
-      })
-    );
   }
 
-  // Add client information centered below logo
   firstPageContent.push(
     new Paragraph({
       children: [
@@ -97,7 +133,7 @@ export const generateWordReport = async (data, columnNames, valueColumns, images
         })
       ],
       alignment: AlignmentType.CENTER,
-      spacing: { after: 300 }
+      spacing: { after: 400 }
     }),
     new Paragraph({
       children: [
@@ -110,7 +146,7 @@ export const generateWordReport = async (data, columnNames, valueColumns, images
         })
       ],
       alignment: AlignmentType.CENTER,
-      spacing: { after: 200 }
+      spacing: { after: 300 }
     }),
     new Paragraph({
       children: [
@@ -122,7 +158,7 @@ export const generateWordReport = async (data, columnNames, valueColumns, images
         })
       ],
       alignment: AlignmentType.CENTER,
-      spacing: { after: 100 }
+      spacing: { after: 150 }
     }),
     new Paragraph({
       children: [
@@ -134,306 +170,788 @@ export const generateWordReport = async (data, columnNames, valueColumns, images
         })
       ],
       alignment: AlignmentType.CENTER,
-      spacing: { after: 200 }
+      spacing: { after: 400 }
     })
   );
 
-  // Create synthesis table
-  const headerCells = [
-    new TableCell({
-      children: [new Paragraph({
-        children: [new TextRun({ 
-          text: "Champs", 
-          bold: true, 
-          color: "FFFFFF",
-          font: "Calibri",
-          size: 20
-        })],
-        alignment: AlignmentType.CENTER
-      })],
-      shading: { fill: "4472C4" },
-      width: { size: 30, type: WidthType.PERCENTAGE }
-    })
-  ];
-
-  columnNames.forEach(columnName => {
-    headerCells.push(new TableCell({
-      children: [new Paragraph({
-        children: [new TextRun({ 
-          text: columnName, 
-          bold: true, 
-          color: "FFFFFF",
-          font: "Calibri",
-          size: 18
-        })],
-        alignment: AlignmentType.CENTER
-      })],
-      shading: { fill: "4472C4" },
-      width: { size: 70 / valueColumns, type: WidthType.PERCENTAGE }
-    }));
-  });
-
-  const headerRow = new TableRow({ children: headerCells });
-
-  const dataRows = syntheseTable.headers.map((header, index) => {
-    const rowColor = index % 2 === 0 ? "F8FAFC" : "FFFFFF";
-    
-    const cells = [
-      new TableCell({
-        children: [new Paragraph({
-          children: [new TextRun({ 
-            text: header, 
-            bold: true,
-            color: "1F2937",
-            font: "Calibri",
-            size: 16
-          })],
-          alignment: AlignmentType.LEFT
-        })],
-        shading: { fill: rowColor },
-        width: { size: 30, type: WidthType.PERCENTAGE }
+  // Create revision table
+  const revisionTable = new Table({
+    rows: [
+      new TableRow({
+        children: [
+          new TableCell({
+            children: [new Paragraph({
+              children: [new TextRun({ text: "INDICE", bold: true, color: "FFFFFF", font: "Calibri", size: 16 })],
+              alignment: AlignmentType.CENTER
+            })],
+            shading: { fill: "4472C4" },
+            width: { size: 15, type: WidthType.PERCENTAGE }
+          }),
+          new TableCell({
+            children: [new Paragraph({
+              children: [new TextRun({ text: "COMMENTAIRES", bold: true, color: "FFFFFF", font: "Calibri", size: 16 })],
+              alignment: AlignmentType.CENTER
+            })],
+            shading: { fill: "4472C4" },
+            width: { size: 50, type: WidthType.PERCENTAGE }
+          }),
+          new TableCell({
+            children: [new Paragraph({
+              children: [new TextRun({ text: "VISA", bold: true, color: "FFFFFF", font: "Calibri", size: 16 })],
+              alignment: AlignmentType.CENTER
+            })],
+            shading: { fill: "4472C4" },
+            width: { size: 15, type: WidthType.PERCENTAGE }
+          }),
+          new TableCell({
+            children: [new Paragraph({
+              children: [new TextRun({ text: "DATE", bold: true, color: "FFFFFF", font: "Calibri", size: 16 })],
+              alignment: AlignmentType.CENTER
+            })],
+            shading: { fill: "4472C4" },
+            width: { size: 20, type: WidthType.PERCENTAGE }
+          })
+        ]
+      }),
+      new TableRow({
+        children: [
+          new TableCell({
+            children: [new Paragraph({
+              children: [new TextRun({ text: indice, font: "Calibri", size: 14 })],
+              alignment: AlignmentType.CENTER
+            })],
+            shading: { fill: "F8FAFC" }
+          }),
+          new TableCell({
+            children: [new Paragraph({
+              children: [new TextRun({ text: revisionComment, font: "Calibri", size: 14 })],
+              alignment: AlignmentType.LEFT
+            })],
+            shading: { fill: "F8FAFC" }
+          }),
+          new TableCell({
+            children: [new Paragraph({
+              children: [new TextRun({ text: revisionVisa, font: "Calibri", size: 14 })],
+              alignment: AlignmentType.CENTER
+            })],
+            shading: { fill: "F8FAFC" }
+          }),
+          new TableCell({
+            children: [new Paragraph({
+              children: [new TextRun({ text: revisionDate, font: "Calibri", size: 14 })],
+              alignment: AlignmentType.CENTER
+            })],
+            shading: { fill: "F8FAFC" }
+          })
+        ]
       })
-    ];
-
-    for (let col = 0; col < valueColumns; col++) {
-      const cellValue = data[col]?.synthese?.[header] || '';
-      const isRed = isRedField('synthese', header);
-      
-      cells.push(new TableCell({
-        children: [new Paragraph({
-          children: [new TextRun({ 
-            text: cellValue.toString(), 
-            bold: isRed,
-            color: isRed ? "DC2626" : "374151",
-            font: "Calibri",
-            size: 14
-          })],
-          alignment: AlignmentType.CENTER
-        })],
-        shading: { fill: isRed ? "FEF2F2" : rowColor },
-        width: { size: 70 / valueColumns, type: WidthType.PERCENTAGE }
-      }));
-    }
-
-    return new TableRow({ children: cells });
+    ],
+    width: { size: 100, type: WidthType.PERCENTAGE }
   });
 
-  const synthesisTable = new Table({
-    rows: [headerRow, ...dataRows],
-    width: { size: 100, type: WidthType.PERCENTAGE },
-    borders: {
-      top: { style: BorderStyle.SINGLE, size: 2, color: "4472C4" },
-      bottom: { style: BorderStyle.SINGLE, size: 2, color: "4472C4" },
-      left: { style: BorderStyle.SINGLE, size: 2, color: "4472C4" },
-      right: { style: BorderStyle.SINGLE, size: 2, color: "4472C4" },
-      insideHorizontal: { style: BorderStyle.SINGLE, size: 1, color: "E5E7EB" },
-      insideVertical: { style: BorderStyle.SINGLE, size: 1, color: "E5E7EB" }
-    }
-  });
-
-  // Second Page Content
+  // Second Page Content (Table of Contents)
   const secondPageContent = [
     new Paragraph({
       children: [new TextRun({ 
-        text: "Tableau de Synthèse", 
-        size: 28, 
-        bold: true,
-        color: "1e3a8a",
-        font: "Calibri"
-      })],
-      heading: HeadingLevel.HEADING_2,
-      spacing: { before: 200, after: 300 },
-      alignment: AlignmentType.CENTER
-    }),
-    synthesisTable
-  ];
-
-  // Third Page Content
-  const thirdPageContent = [
-    new Paragraph({
-      children: [new TextRun({ 
-        text: "Détails Techniques", 
-        size: 28, 
-        bold: true,
-        color: "1e3a8a",
-        font: "Calibri"
-      })],
-      heading: HeadingLevel.HEADING_2,
-      spacing: { before: 200, after: 300 },
-      alignment: AlignmentType.CENTER
-    }),
-    new Paragraph({
-      children: [new TextRun({ 
-        text: `Document généré le ${new Date().toLocaleDateString('fr-FR')} à ${new Date().toLocaleTimeString('fr-FR')}`, 
+        text: introductionText, 
         size: 16,
-        italics: true,
-        color: "6b7280",
-        font: "Calibri"
-      })],
-      alignment: AlignmentType.CENTER,
-      spacing: { after: 300 }
-    }),
-    new Paragraph({
-      children: [new TextRun({ 
-        text: `Nombre de colonnes de données : ${valueColumns}`, 
-        size: 14,
         color: "374151",
         font: "Calibri"
       })],
-      spacing: { after: 100 }
+      spacing: { before: 200, after: 400 },
+      alignment: AlignmentType.JUSTIFY
+    }),
+    revisionTable,
+    new Paragraph({
+      children: [new TextRun({ text: "" })],
+      spacing: { after: 400 }
     }),
     new Paragraph({
       children: [new TextRun({ 
-        text: `Colonnes : ${columnNames.join(', ')}`, 
-        size: 14,
-        color: "374151",
-        font: "Calibri"
-      })],
-      spacing: { after: 200 }
-    })
-  ];
-
-  // Fourth Page Content
-  const fourthPageContent = [
-    new Paragraph({
-      children: [new TextRun({ 
-        text: "Images et Annexes", 
-        size: 28, 
+        text: "Table des matières", 
+        size: 24, 
         bold: true,
         color: "1e3a8a",
         font: "Calibri"
       })],
-      heading: HeadingLevel.HEADING_2,
-      spacing: { before: 200, after: 300 },
-      alignment: AlignmentType.CENTER
-    })
-  ];
+      spacing: { before: 400, after: 300 },
+      alignment: AlignmentType.LEFT
+    }),
+    new Paragraph({
+     children: [new TextRun({ 
+       text: "I. Définition du besoin & données d'entrée :.................................................................................3", 
+       size: 14,
+       font: "Calibri"
+     })],
+     spacing: { after: 100 }
+   }),
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "II. Présentation offre technique :...................................................................................................... 4", 
+       size: 14,
+       font: "Calibri"
+     })],
+     spacing: { after: 100 }
+   }),
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "III. Conditions tarifaires:.....................................................................................................................5", 
+       size: 14,
+       font: "Calibri"
+     })],
+     spacing: { after: 100 }
+   }),
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "IV. Délais Projet : ................................................................................................................................. 6", 
+       size: 14,
+       font: "Calibri"
+     })],
+     spacing: { after: 100 }
+   }),
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "V. Réserves :........................................................................................................................................ 6", 
+       size: 14,
+       font: "Calibri"
+     })],
+     spacing: { after: 100 }
+   }),
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "VI. Conditions de réalisation : ............................................................................................................7", 
+       size: 14,
+       font: "Calibri"
+     })],
+     spacing: { after: 200 }
+   })
+ ];
 
-  if (images.length > 0) {
-    for (let i = 0; i < images.length; i++) {
-      const img = images[i];
-      
-      try {
-        fourthPageContent.push(
-          new Paragraph({
-            children: [new TextRun({ 
-              text: `Image ${i + 1}: ${img.name}`, 
-              size: 18, 
-              bold: true,
-              color: "374151",
-              font: "Calibri"
-            })],
-            spacing: { before: 200, after: 100 }
-          })
-        );
+ // Helper function to create section content with images
+ const createSectionContent = (sections) => {
+   const content = [];
+   sections.forEach((section, index) => {
+     if (section.title) {
+       content.push(
+         new Paragraph({
+           children: [new TextRun({ 
+             text: section.title, 
+             size: 18, 
+             bold: true,
+             color: "374151",
+             font: "Calibri"
+           })],
+           spacing: { before: 300, after: 200 }
+         })
+       );
+     }
 
-        const imageRun = new ImageRun({
-          data: img.buffer,
-          transformation: {
-            width: 400,
-            height: 300,
-          },
-        });
+     if (section.content) {
+       content.push(
+         new Paragraph({
+           children: [new TextRun({ 
+             text: section.content, 
+             size: 14,
+             color: "374151",
+             font: "Calibri"
+           })],
+           spacing: { after: 200 },
+           alignment: AlignmentType.JUSTIFY
+         })
+       );
+     }
 
-        fourthPageContent.push(
-          new Paragraph({
-            children: [imageRun],
-            alignment: AlignmentType.CENTER,
-            spacing: { after: 300 }
-          })
-        );
-        
-      } catch (error) {
-        console.error(`Error processing image ${img.name}:`, error);
-        fourthPageContent.push(
-          new Paragraph({
-            children: [new TextRun({ 
-              text: `Erreur: Impossible d'insérer l'image ${img.name}`, 
-              color: "DC2626",
-              font: "Calibri"
-            })],
-            spacing: { before: 100, after: 200 }
-          })
-        );
-      }
-    }
-  } else {
-    fourthPageContent.push(
-      new Paragraph({
-        children: [new TextRun({ 
-          text: "Aucune image ajoutée", 
-          italics: true,
-          size: 16,
-          color: "9CA3AF",
-          font: "Calibri"
-        })],
-        alignment: AlignmentType.CENTER,
-        spacing: { after: 200 }
-      })
-    );
-  }
+     if (section.image) {
+       try {
+         const imageRun = new ImageRun({
+           data: section.image.buffer,
+           transformation: {
+             width: 400,
+             height: 300,
+           },
+         });
 
-  const doc = new Document({
-    sections: [
-      // First page (no headers)
-      {
-        children: firstPageContent,
-        properties: {
-          page: {
-            pageNumbers: { start: 1, formatType: "decimal" }
-          }
-        }
-      },
-      // Second page with header
-      {
-        headers: {
-          default: createHeader()
-        },
-        children: secondPageContent,
-        properties: {
-          page: {
-            pageNumbers: { start: 2, formatType: "decimal" }
-          }
-        }
-      },
-      // Third page with header
-      {
-        headers: {
-          default: createHeader()
-        },
-        children: thirdPageContent,
-        properties: {
-          page: {
-            pageNumbers: { start: 3, formatType: "decimal" }
-          }
-        }
-      },
-      // Fourth page with header
-      {
-        headers: {
-          default: createHeader()
-        },
-        children: fourthPageContent,
-        properties: {
-          page: {
-            pageNumbers: { start: 4, formatType: "decimal" }
-          }
-        }
-      }
-    ]
-  });
+         content.push(
+           new Paragraph({
+             children: [imageRun],
+             alignment: AlignmentType.CENTER,
+             spacing: { after: 300 }
+           })
+         );
+       } catch (error) {
+         console.error(`Error processing section image:`, error);
+       }
+     }
+   });
+   return content;
+ };
 
-  const blob = await Packer.toBlob(doc);
-  return blob;
+ // Page 3: Définition du besoin & données d'entrée
+ const page3Content = [
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "I. Définition du besoin & données d'entrée", 
+       size: 24, 
+       bold: true,
+       color: "1e3a8a",
+       font: "Calibri"
+     })],
+     spacing: { before: 200, after: 400 }
+   }),
+   ...createSectionContent(definitionSections)
+ ];
+
+ // Page 4: Présentation offre technique
+ const page4Content = [
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "II. Présentation offre technique", 
+       size: 24, 
+       bold: true,
+       color: "1e3a8a",
+       font: "Calibri"
+     })],
+     spacing: { before: 200, after: 400 }
+   }),
+   ...createSectionContent(presentationSections)
+ ];
+
+ // Page 5: Conditions tarifaires (empty with just title)
+ const page5Content = [
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "III. Conditions tarifaires", 
+       size: 24, 
+       bold: true,
+       color: "1e3a8a",
+       font: "Calibri"
+     })],
+     spacing: { before: 200, after: 400 }
+   }),
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "[Contenu à développer]", 
+       size: 14,
+       italics: true,
+       color: "9CA3AF",
+       font: "Calibri"
+     })],
+     spacing: { after: 300 }
+   })
+ ];
+
+ // Page 6: Délais Projet & Réserves
+ const createDelaisAndReservesContent = () => {
+   const content = [
+     new Paragraph({
+       children: [new TextRun({ 
+         text: "IV. Délais Projet", 
+         size: 24, 
+         bold: true,
+         color: "1e3a8a",
+         font: "Calibri"
+       })],
+       spacing: { before: 200, after: 400 }
+     }),
+     new Paragraph({
+       children: [new TextRun({ 
+         text: "Ci-dessous sont indiqués les délais techniques :", 
+         size: 16,
+         color: "374151",
+         font: "Calibri"
+       })],
+       spacing: { after: 200 }
+     })
+   ];
+
+   // Create table for delais
+   if (delaisItems.length > 0) {
+     const delaisTable = new Table({
+       rows: [
+         // Header row
+         new TableRow({
+           children: [
+             new TableCell({
+               children: [new Paragraph({
+                 children: [new TextRun({ text: "Etapes", bold: true, font: "Calibri", size: 14 })],
+                 alignment: AlignmentType.CENTER
+               })],
+               shading: { fill: "E5E7EB" },
+               width: { size: 60, type: WidthType.PERCENTAGE }
+             }),
+             new TableCell({
+               children: [new Paragraph({
+                 children: [new TextRun({ text: "Délais", bold: true, font: "Calibri", size: 14 })],
+                 alignment: AlignmentType.CENTER
+               })],
+               shading: { fill: "E5E7EB" },
+               width: { size: 40, type: WidthType.PERCENTAGE }
+             })
+           ]
+         }),
+         // Data rows
+         ...delaisItems.map(item => new TableRow({
+           children: [
+             new TableCell({
+               children: [new Paragraph({
+                 children: [new TextRun({ text: item.etape, font: "Calibri", size: 14 })],
+                 alignment: AlignmentType.LEFT
+               })],
+               shading: { fill: "F8FAFC" }
+             }),
+             new TableCell({
+               children: [new Paragraph({
+                 children: [new TextRun({ text: item.delai, font: "Calibri", size: 14 })],
+                 alignment: AlignmentType.LEFT
+               })],
+               shading: { fill: "F8FAFC" }
+             })
+           ]
+         }))
+       ],
+       width: { size: 100, type: WidthType.PERCENTAGE },
+       borders: {
+         top: { style: BorderStyle.SINGLE, size: 1, color: "D1D5DB" },
+         bottom: { style: BorderStyle.SINGLE, size: 1, color: "D1D5DB" },
+         left: { style: BorderStyle.SINGLE, size: 1, color: "D1D5DB" },
+         right: { style: BorderStyle.SINGLE, size: 1, color: "D1D5DB" },
+         insideHorizontal: { style: BorderStyle.SINGLE, size: 1, color: "E5E7EB" },
+         insideVertical: { style: BorderStyle.SINGLE, size: 1, color: "E5E7EB" }
+       }
+     });
+
+     content.push(delaisTable);
+   }
+
+   // Add Réserves section
+   content.push(
+     new Paragraph({
+       children: [new TextRun({ 
+         text: "V. Réserves", 
+         size: 24, 
+         bold: true,
+         color: "1e3a8a",
+         font: "Calibri"
+       })],
+       spacing: { before: 400, after: 300 }
+     })
+   );
+
+   reservesItems.forEach(item => {
+     content.push(
+       new Paragraph({
+         children: [
+           new TextRun({ 
+             text: "➔ ", 
+             size: 16,
+             color: "374151",
+             font: "Calibri"
+           }),
+           new TextRun({ 
+             text: `${item.type} : ${item.description}`, 
+             size: 16,
+             color: "374151",
+             font: "Calibri"
+           })
+         ],
+         spacing: { after: 100 }
+       })
+     );
+   });
+
+   return content;
+ };
+
+ const page6Content = createDelaisAndReservesContent();
+
+ // Page 7: Conditions de réalisation
+ const page7Content = [
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "VI. Conditions de réalisation", 
+       size: 24, 
+       bold: true,
+       color: "1e3a8a",
+       font: "Calibri"
+     })],
+     spacing: { before: 200, after: 400 }
+   }),
+   
+   // Basic conditions
+   new Paragraph({
+     children: [
+       new TextRun({ text: "- ", size: 16, color: "374151", font: "Calibri" }),
+       new TextRun({ text: "MOQ : ", size: 16, bold: true, color: "374151", font: "Calibri" }),
+       new TextRun({ text: moq, size: 16, color: "374151", font: "Calibri" })
+     ],
+     spacing: { after: 100 }
+   }),
+   new Paragraph({
+     children: [
+       new TextRun({ text: "- ", size: 16, color: "374151", font: "Calibri" }),
+       new TextRun({ text: "Conditions de transport : ", size: 16, bold: true, color: "374151", font: "Calibri" }),
+       new TextRun({ text: transportConditions, size: 16, color: "374151", font: "Calibri" })
+     ],
+     spacing: { after: 100 }
+   }),
+   new Paragraph({
+     children: [
+       new TextRun({ text: "- ", size: 16, color: "374151", font: "Calibri" }),
+       new TextRun({ text: "Contrôle en série : ", size: 16, bold: true, color: "374151", font: "Calibri" }),
+       new TextRun({ text: seriesControl, size: 16, color: "374151", font: "Calibri" })
+     ],
+     spacing: { after: 100 }
+   }),
+   new Paragraph({
+     children: [
+       new TextRun({ text: "- ", size: 16, color: "374151", font: "Calibri" }),
+       new TextRun({ text: "Emballage : ", size: 16, bold: true, color: "374151", font: "Calibri" }),
+       new TextRun({ text: packaging, size: 16, color: "374151", font: "Calibri" })
+     ],
+     spacing: { after: 300 }
+   }),
+
+   // Offer validity
+   new Paragraph({
+     children: [
+       new TextRun({ text: "Validité de l'offre : ", size: 16, bold: true, color: "374151", font: "Calibri" }),
+       new TextRun({ text: offerValidity, size: 16, color: "374151", font: "Calibri" })
+     ],
+     spacing: { after: 300 }
+   }),
+
+   // Payment conditions
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "Conditions de règlement :", 
+       size: 18, 
+       bold: true,
+       color: "374151",
+       font: "Calibri"
+     })],
+     spacing: { after: 200 }
+   }),
+
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "Outillages :", 
+       size: 16, 
+       bold: true,
+       color: "374151",
+       font: "Calibri"
+     })],
+     spacing: { after: 100 }
+   }),
+   new Paragraph({
+     children: [
+       new TextRun({ text: "• ", size: 14, color: "374151", font: "Calibri" }),
+       new TextRun({ text: toolingInvoicing, size: 14, color: "374151", font: "Calibri" })
+     ],
+     spacing: { after: 50 }
+   }),
+   new Paragraph({
+     children: [
+       new TextRun({ text: "• ", size: 14, color: "374151", font: "Calibri" }),
+       new TextRun({ text: toolingBalance, size: 14, color: "374151", font: "Calibri" })
+     ],
+     spacing: { after: 50 }
+   }),
+   new Paragraph({
+     children: [
+       new TextRun({ text: "*", size: 14, italics: true, color: "374151", font: "Calibri" }),
+       new TextRun({ text: toolingDelay, size: 14, italics: true, color: "374151", font: "Calibri" }),
+       new TextRun({ text: "*", size: 14, italics: true, color: "374151", font: "Calibri" })
+     ],
+     spacing: { after: 200 }
+   }),
+
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "Pièces :", 
+       size: 16, 
+       bold: true,
+       color: "374151",
+       font: "Calibri"
+     })],
+     spacing: { after: 100 }
+   }),
+   new Paragraph({
+     children: [
+       new TextRun({ text: "• ", size: 14, color: "374151", font: "Calibri" }),
+       new TextRun({ text: partsPayment, size: 14, color: "374151", font: "Calibri" })
+     ],
+     spacing: { after: 50 }
+   }),
+   new Paragraph({
+     children: [
+       new TextRun({ text: "• ", size: 14, color: "374151", font: "Calibri" }),
+       new TextRun({ text: partsTransport, size: 14, color: "374151", font: "Calibri" })
+     ],
+     spacing: { after: 200 }
+   }),
+
+   // General conditions
+   new Paragraph({
+     children: [
+       new TextRun({ text: "Conditions générales : ", size: 14, bold: true, color: "374151", font: "Calibri" }),
+       new TextRun({ text: "nous exécutons les commandes, suivant les Conditions Générales de Vente de Somocap, en annexe", size: 14, color: "374151", font: "Calibri" })
+     ],
+     spacing: { after: 300 }
+   }),
+
+   // Signature section
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "Signature :", 
+       size: 16, 
+       bold: true,
+       color: "374151",
+       font: "Calibri"
+     })],
+     spacing: { after: 100 }
+   }),
+   new Paragraph({
+     children: [
+       new TextRun({ text: "Nom : ", size: 14, bold: true, color: "374151", font: "Calibri" }),
+       new TextRun({ text: signerName, size: 14, color: "374151", font: "Calibri" })
+     ],
+     spacing: { after: 50 }
+   }),
+   new Paragraph({
+     children: [
+       new TextRun({ text: "Fonction : ", size: 14, bold: true, color: "374151", font: "Calibri" }),
+       new TextRun({ text: signerRole, size: 14, color: "374151", font: "Calibri" })
+     ],
+     spacing: { after: 200 }
+   }),
+
+   // Legal text
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "La Société SOMOCAP se réserve la propriété des marchandises jusqu'au paiement de l'intégralité du prix et de toutes sommes s'y rattachant. Le transfert de propriété ne s'opère au profit de l'acheteur qu'après règlement de la dernière échéance. (Loi 80-355 du 12/05/1980)", 
+       size: 12,
+       italics: true,
+       color: "6b7280",
+       font: "Calibri"
+     })],
+     spacing: { before: 300, after: 200 },
+     alignment: AlignmentType.JUSTIFY
+   })
+ ];
+
+ // Images page content
+ const imagesPageContent = [
+   new Paragraph({
+     children: [new TextRun({ 
+       text: "Images et Annexes", 
+       size: 28, 
+       bold: true,
+       color: "1e3a8a",
+       font: "Calibri"
+     })],
+     heading: HeadingLevel.HEADING_2,
+     spacing: { before: 200, after: 300 },
+     alignment: AlignmentType.CENTER
+   })
+ ];
+
+ if (images.length > 0) {
+   for (let i = 0; i < images.length; i++) {
+     const img = images[i];
+     
+     try {
+       imagesPageContent.push(
+         new Paragraph({
+           children: [new TextRun({ 
+             text: `Image ${i + 1}: ${img.name}`, 
+             size: 18, 
+             bold: true,
+             color: "374151",
+             font: "Calibri"
+           })],
+           spacing: { before: 200, after: 100 }
+         })
+       );
+
+       const imageRun = new ImageRun({
+         data: img.buffer,
+         transformation: {
+           width: 400,
+           height: 300,
+         },
+       });
+
+       imagesPageContent.push(
+         new Paragraph({
+           children: [imageRun],
+           alignment: AlignmentType.CENTER,
+           spacing: { after: 300 }
+         })
+       );
+       
+     } catch (error) {
+       console.error(`Error processing image ${img.name}:`, error);
+       imagesPageContent.push(
+         new Paragraph({
+           children: [new TextRun({ 
+             text: `Erreur: Impossible d'insérer l'image ${img.name}`, 
+             color: "DC2626",
+             font: "Calibri"
+           })],
+           spacing: { before: 100, after: 200 }
+         })
+       );
+     }
+   }
+ } else {
+   imagesPageContent.push(
+     new Paragraph({
+       children: [new TextRun({ 
+         text: "Aucune image ajoutée", 
+         italics: true,
+         size: 16,
+         color: "9CA3AF",
+         font: "Calibri"
+       })],
+       alignment: AlignmentType.CENTER,
+       spacing: { after: 200 }
+     })
+   );
+ }
+
+ const doc = new Document({
+   sections: [
+     // First page (no headers/footers)
+     {
+       children: firstPageContent,
+       properties: {
+         page: {
+           pageNumbers: { start: 1, formatType: "decimal" }
+         }
+       },
+       footers: footer ? {
+         default: footer
+       } : undefined
+     },
+     // Second page with header (table of contents)
+     {
+       headers: {
+         default: createHeader()
+       },
+       footers: footer ? {
+         default: footer
+       } : undefined,
+       children: secondPageContent,
+       properties: {
+         page: {
+           pageNumbers: { start: 2, formatType: "decimal" }
+         }
+       }
+     },
+     // Page 3: Définition du besoin
+     {
+       headers: {
+         default: createHeader()
+       },
+       footers: footer ? {
+         default: footer
+       } : undefined,
+       children: page3Content,
+       properties: {
+         page: {
+           pageNumbers: { start: 3, formatType: "decimal" }
+         }
+       }
+     },
+     // Page 4: Présentation offre technique
+     {
+       headers: {
+         default: createHeader()
+       },
+       footers: footer ? {
+         default: footer
+       } : undefined,
+       children: page4Content,
+       properties: {
+         page: {
+           pageNumbers: { start: 4, formatType: "decimal" }
+         }
+       }
+     },
+     // Page 5: Conditions tarifaires
+     {
+       headers: {
+         default: createHeader()
+       },
+       footers: footer ? {
+         default: footer
+       } : undefined,
+       children: page5Content,
+       properties: {
+         page: {
+           pageNumbers: { start: 5, formatType: "decimal" }
+         }
+       }
+     },
+     // Page 6: Délais Projet & Réserves
+     {
+       headers: {
+         default: createHeader()
+       },
+       footers: footer ? {
+         default: footer
+       } : undefined,
+       children: page6Content,
+       properties: {
+         page: {
+           pageNumbers: { start: 6, formatType: "decimal" }
+         }
+       }
+     },
+     // Page 7: Conditions de réalisation
+     {
+       headers: {
+         default: createHeader()
+       },
+       footers: footer ? {
+         default: footer
+       } : undefined,
+       children: page7Content,
+       properties: {
+         page: {
+           pageNumbers: { start: 7, formatType: "decimal" }
+         }
+       }
+     },
+     // Page 8: Images and annexes
+     {
+       headers: {
+         default: createHeader()
+       },
+       footers: footer ? {
+         default: footer
+       } : undefined,
+       children: imagesPageContent,
+       properties: {
+         page: {
+           pageNumbers: { start: 8, formatType: "decimal" }
+         }
+       }
+     }
+   ]
+ });
+
+ const blob = await Packer.toBlob(doc);
+ return blob;
 };
 
 export const downloadBlob = (blob, filename) => {
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  window.URL.revokeObjectURL(url);
+ const url = window.URL.createObjectURL(blob);
+ const link = document.createElement('a');
+ link.href = url;
+ link.download = filename;
+ document.body.appendChild(link);
+ link.click();
+ document.body.removeChild(link);
+ window.URL.revokeObjectURL(url);
 };
