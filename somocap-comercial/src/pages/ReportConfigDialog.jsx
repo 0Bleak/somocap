@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions, Button,
   TextField, Grid, Box, Typography, IconButton, Accordion, AccordionSummary, AccordionDetails
@@ -8,13 +8,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-const ReportConfigDialog = ({ open, onClose, onGenerate, documentName }) => {
+const ReportConfigDialog = ({ open, onClose, onGenerate, documentName, documentData }) => {
   const [config, setConfig] = useState({
-    clientName: 'Mme DENIS',
-    clientCompany: 'société GDP',
-    contactName: 'Kévin GUY',
-    contactEmail: 'k.guy@somocap.com',
-    contactPhone: '06.14.49.26.05',
+    clientName: '',
+    clientCompany: '',
+    contactName: '',
+    contactEmail: '',
+    contactPhone: '',
     indice: 'A',
     logoImage: null,
     footerImage: null,
@@ -66,6 +66,20 @@ const ReportConfigDialog = ({ open, onClose, onGenerate, documentName }) => {
     signerName: '',
     signerRole: ''
   });
+
+  // Update config when documentData changes
+  useEffect(() => {
+    if (documentData && open) {
+      setConfig(prev => ({
+        ...prev,
+        clientName: documentData.clientName || '',
+        clientCompany: documentData.clientCompany || '',
+        contactName: documentData.contactName || '',
+        contactEmail: documentData.contactEmail || '',
+        contactPhone: documentData.contactPhone || ''
+      }));
+    }
+  }, [documentData, open]);
 
   const handleInputChange = (field, value) => {
     setConfig(prev => ({ ...prev, [field]: value }));
@@ -173,387 +187,387 @@ const ReportConfigDialog = ({ open, onClose, onGenerate, documentName }) => {
   };
 
   const removeDelaisItem = (index) => {
-    setConfig(prev => ({
-      ...prev,
-      delaisItems: prev.delaisItems.filter((_, i) => i !== index)
-    }));
-  };
+setConfig(prev => ({
+     ...prev,
+     delaisItems: prev.delaisItems.filter((_, i) => i !== index)
+   }));
+ };
 
-  const addReservesItem = () => {
-    setConfig(prev => ({
-      ...prev,
-      reservesItems: [...prev.reservesItems, { type: "", description: "" }]
-    }));
-  };
+ const addReservesItem = () => {
+   setConfig(prev => ({
+     ...prev,
+     reservesItems: [...prev.reservesItems, { type: "", description: "" }]
+   }));
+ };
 
-  const removeReservesItem = (index) => {
-    setConfig(prev => ({
-      ...prev,
-      reservesItems: prev.reservesItems.filter((_, i) => i !== index)
-    }));
-  };
+ const removeReservesItem = (index) => {
+   setConfig(prev => ({
+     ...prev,
+     reservesItems: prev.reservesItems.filter((_, i) => i !== index)
+   }));
+ };
 
-  const handleGenerate = () => {
-    onGenerate({ ...config, filename: documentName });
-    onClose();
-  };
+ const handleGenerate = () => {
+   onGenerate({ ...config, filename: documentName });
+   onClose();
+ };
 
-  const renderSectionEditor = (sectionType, sections, title) => (
-    <Accordion>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography variant="h6">{title}</Typography>
-      </AccordionSummary>
-      <AccordionDetails>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          {sections.map((section, index) => (
-            <Box key={index} sx={{ border: '1px solid #e0e0e0', borderRadius: 1, p: 2 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    label="Titre de la section"
-                    value={section.title}
-                    onChange={(e) => handleSectionChange(sectionType, index, 'title', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    label="Contenu"
-                    value={section.content}
-                    onChange={(e) => handleSectionChange(sectionType, index, 'content', e.target.value)}
-                  />
-                </Grid>
-                <Grid item xs={8}>
-                  <Button
-                    variant="outlined"
-                    component="label"
-                    startIcon={<PhotoCameraIcon />}
-                  >
-                    Ajouter une image
-                    <input
-                      type="file"
-                      hidden
-                      accept="image/*"
-                      onChange={(e) => handleSectionImageUpload(sectionType, index, e)}
-                    />
-                  </Button>
-                  {section.image && (
-                    <Typography variant="body2" sx={{ mt: 1 }}>
-                      Image: {section.image.name}
-                    </Typography>
-                  )}
-                </Grid>
-                <Grid item xs={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                  <IconButton onClick={() => removeSection(sectionType, index)} color="error">
-                    <DeleteIcon />
-                  </IconButton>
-                </Grid>
-              </Grid>
-            </Box>
-          ))}
-          <Button 
-            onClick={() => addSection(sectionType)} 
-            variant="outlined" 
-            startIcon={<AddIcon />}
-          >
-            Ajouter une section
-          </Button>
-        </Box>
-      </AccordionDetails>
-    </Accordion>
-  );
+ const renderSectionEditor = (sectionType, sections, title) => (
+   <Accordion>
+     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+       <Typography variant="h6">{title}</Typography>
+     </AccordionSummary>
+     <AccordionDetails>
+       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+         {sections.map((section, index) => (
+           <Box key={index} sx={{ border: '1px solid #e0e0e0', borderRadius: 1, p: 2 }}>
+             <Grid container spacing={2}>
+               <Grid item xs={12}>
+                 <TextField
+                   fullWidth
+                   label="Titre de la section"
+                   value={section.title}
+                   onChange={(e) => handleSectionChange(sectionType, index, 'title', e.target.value)}
+                 />
+               </Grid>
+               <Grid item xs={12}>
+                 <TextField
+                   fullWidth
+                   multiline
+                   rows={4}
+                   label="Contenu"
+                   value={section.content}
+                   onChange={(e) => handleSectionChange(sectionType, index, 'content', e.target.value)}
+                 />
+               </Grid>
+               <Grid item xs={8}>
+                 <Button
+                   variant="outlined"
+                   component="label"
+                   startIcon={<PhotoCameraIcon />}
+                 >
+                   Ajouter une image
+                   <input
+                     type="file"
+                     hidden
+                     accept="image/*"
+                     onChange={(e) => handleSectionImageUpload(sectionType, index, e)}
+                   />
+                 </Button>
+                 {section.image && (
+                   <Typography variant="body2" sx={{ mt: 1 }}>
+                     Image: {section.image.name}
+                   </Typography>
+                 )}
+               </Grid>
+               <Grid item xs={4} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                 <IconButton onClick={() => removeSection(sectionType, index)} color="error">
+                   <DeleteIcon />
+                 </IconButton>
+               </Grid>
+             </Grid>
+           </Box>
+         ))}
+         <Button 
+           onClick={() => addSection(sectionType)} 
+           variant="outlined" 
+           startIcon={<AddIcon />}
+         >
+           Ajouter une section
+         </Button>
+       </Box>
+     </AccordionDetails>
+   </Accordion>
+ );
 
-  return (
-    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
-      <DialogTitle>Configuration du Rapport</DialogTitle>
-      <DialogContent>
-        <Grid container spacing={3} sx={{ mt: 1 }}>
-          {/* Basic Information */}
-          <Grid item xs={12}>
-            <Accordion defaultExpanded>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6">Informations de base</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      label="Nom du client"
-                      value={config.clientName}
-                      onChange={(e) => handleInputChange('clientName', e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      label="Société"
-                      value={config.clientCompany}
-                      onChange={(e) => handleInputChange('clientCompany', e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      label="Nom du contact"
-                      value={config.contactName}
-                      onChange={(e) => handleInputChange('contactName', e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      label="Email"
-                      value={config.contactEmail}
-                      onChange={(e) => handleInputChange('contactEmail', e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      label="Téléphone"
-                      value={config.contactPhone}
-                      onChange={(e) => handleInputChange('contactPhone', e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      label="Indice"
-                      value={config.indice}
-                      onChange={(e) => handleInputChange('indice', e.target.value.toUpperCase())}
-                      inputProps={{ maxLength: 3 }}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      multiline
-                      rows={3}
-                      label="Texte d'introduction"
-                      value={config.introductionText}
-                      onChange={(e) => handleInputChange('introductionText', e.target.value)}
-                    />
-                  </Grid>
-                  
-                  {/* Logo Upload */}
-                  <Grid item xs={6}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Button
-                        variant="outlined"
-                        component="label"
-                        startIcon={<PhotoCameraIcon />}
-                      >
-                        Logo en-tête
-                        <input
-                          type="file"
-                          hidden
-                          accept="image/*"
-                          onChange={handleLogoUpload}
-                        />
-                      </Button>
-                      {config.logoImage && (
-                        <Typography variant="body2">{config.logoImage.name}</Typography>
-                      )}
-                    </Box>
-                  </Grid>
-                  
-                  {/* Footer Image Upload */}
-                  <Grid item xs={6}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <Button
-                        variant="outlined"
-                        component="label"
-                        startIcon={<PhotoCameraIcon />}
-                      >
-                        Image pied de page
-                        <input
-                          type="file"
-                          hidden
-                          accept="image/*"
-                          onChange={handleFooterUpload}
-                        />
-                      </Button>
-                      {config.footerImage && (
-                        <Typography variant="body2">{config.footerImage.name}</Typography>
-                      )}
-                    </Box>
-                  </Grid>
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-          </Grid>
+ return (
+   <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+     <DialogTitle>Configuration du Rapport</DialogTitle>
+     <DialogContent>
+       <Grid container spacing={3} sx={{ mt: 1 }}>
+         {/* Basic Information */}
+         <Grid item xs={12}>
+           <Accordion defaultExpanded>
+             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+               <Typography variant="h6">Informations de base</Typography>
+             </AccordionSummary>
+             <AccordionDetails>
+               <Grid container spacing={2}>
+                 <Grid item xs={6}>
+                   <TextField
+                     fullWidth
+                     label="Nom du client"
+                     value={config.clientName}
+                     onChange={(e) => handleInputChange('clientName', e.target.value)}
+                   />
+                 </Grid>
+                 <Grid item xs={6}>
+                   <TextField
+                     fullWidth
+                     label="Société"
+                     value={config.clientCompany}
+                     onChange={(e) => handleInputChange('clientCompany', e.target.value)}
+                   />
+                 </Grid>
+                 <Grid item xs={6}>
+                   <TextField
+                     fullWidth
+                     label="Nom du contact"
+                     value={config.contactName}
+                     onChange={(e) => handleInputChange('contactName', e.target.value)}
+                   />
+                 </Grid>
+                 <Grid item xs={6}>
+                   <TextField
+                     fullWidth
+                     label="Email"
+                     value={config.contactEmail}
+                     onChange={(e) => handleInputChange('contactEmail', e.target.value)}
+                   />
+                 </Grid>
+                 <Grid item xs={6}>
+                   <TextField
+                     fullWidth
+                     label="Téléphone"
+                     value={config.contactPhone}
+                     onChange={(e) => handleInputChange('contactPhone', e.target.value)}
+                   />
+                 </Grid>
+                 <Grid item xs={6}>
+                   <TextField
+                     fullWidth
+                     label="Indice"
+                     value={config.indice}
+                     onChange={(e) => handleInputChange('indice', e.target.value.toUpperCase())}
+                     inputProps={{ maxLength: 3 }}
+                   />
+                 </Grid>
+                 <Grid item xs={12}>
+                   <TextField
+                     fullWidth
+                     multiline
+                     rows={3}
+                     label="Texte d'introduction"
+                     value={config.introductionText}
+                     onChange={(e) => handleInputChange('introductionText', e.target.value)}
+                   />
+                 </Grid>
+                 
+                 {/* Logo Upload */}
+                 <Grid item xs={6}>
+                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                     <Button
+                       variant="outlined"
+                       component="label"
+                       startIcon={<PhotoCameraIcon />}
+                     >
+                       Logo en-tête
+                       <input
+                         type="file"
+                         hidden
+                         accept="image/*"
+                         onChange={handleLogoUpload}
+                       />
+                     </Button>
+                     {config.logoImage && (
+                       <Typography variant="body2">{config.logoImage.name}</Typography>
+                     )}
+                   </Box>
+                 </Grid>
+                 
+                 {/* Footer Image Upload */}
+                 <Grid item xs={6}>
+                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                     <Button
+                       variant="outlined"
+                       component="label"
+                       startIcon={<PhotoCameraIcon />}
+                     >
+                       Image pied de page
+                       <input
+                         type="file"
+                         hidden
+                         accept="image/*"
+                         onChange={handleFooterUpload}
+                       />
+                     </Button>
+                     {config.footerImage && (
+                       <Typography variant="body2">{config.footerImage.name}</Typography>
+                     )}
+                   </Box>
+                 </Grid>
+               </Grid>
+             </AccordionDetails>
+           </Accordion>
+         </Grid>
 
-          {/* Page Content Sections */}
-          <Grid item xs={12}>
-            {renderSectionEditor('definitionSections', config.definitionSections, 'Page 3 - Définition du besoin & données d\'entrée')}
-          </Grid>
+         {/* Page Content Sections */}
+         <Grid item xs={12}>
+           {renderSectionEditor('definitionSections', config.definitionSections, 'Page 3 - Définition du besoin & données d\'entrée')}
+         </Grid>
 
-          <Grid item xs={12}>
-            {renderSectionEditor('presentationSections', config.presentationSections, 'Page 4 - Présentation offre technique')}
-          </Grid>
+         <Grid item xs={12}>
+           {renderSectionEditor('presentationSections', config.presentationSections, 'Page 4 - Présentation offre technique')}
+         </Grid>
 
-          {/* Délais & Réserves */}
-          <Grid item xs={12}>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6">Page 6 - Délais & Réserves</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Box sx={{ mb: 3 }}>
-                  <Typography variant="subtitle1" gutterBottom>Délais Projet</Typography>
-                  {config.delaisItems.map((item, index) => (
-                    <Grid container spacing={2} key={index} sx={{ mb: 2 }}>
-                      <Grid item xs={8}>
-                        <TextField
-                          fullWidth
-                          label={`Étape ${index + 1}`}
-                          value={item.etape}
-                          onChange={(e) => handleDelaisChange(index, 'etape', e.target.value)}
-                        />
-                      </Grid>
-                      <Grid item xs={3}>
-                        <TextField
-                          fullWidth
-                          label="Délai"
-                          value={item.delai}
-                          onChange={(e) => handleDelaisChange(index, 'delai', e.target.value)}
-                        />
-                      </Grid>
-                      <Grid item xs={1}>
-                        <IconButton onClick={() => removeDelaisItem(index)} color="error">
-                          <DeleteIcon />
-                        </IconButton>
-                      </Grid>
-                    </Grid>
-                  ))}
-                  <Button onClick={addDelaisItem} variant="outlined" startIcon={<AddIcon />}>
-                    Ajouter une étape
-                  </Button>
-                </Box>
+         {/* Délais & Réserves */}
+         <Grid item xs={12}>
+           <Accordion>
+             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+               <Typography variant="h6">Page 6 - Délais & Réserves</Typography>
+             </AccordionSummary>
+             <AccordionDetails>
+               <Box sx={{ mb: 3 }}>
+                 <Typography variant="subtitle1" gutterBottom>Délais Projet</Typography>
+                 {config.delaisItems.map((item, index) => (
+                   <Grid container spacing={2} key={index} sx={{ mb: 2 }}>
+                     <Grid item xs={8}>
+                       <TextField
+                         fullWidth
+                         label={`Étape ${index + 1}`}
+                         value={item.etape}
+                         onChange={(e) => handleDelaisChange(index, 'etape', e.target.value)}
+                       />
+                     </Grid>
+                     <Grid item xs={3}>
+                       <TextField
+                         fullWidth
+                         label="Délai"
+                         value={item.delai}
+                         onChange={(e) => handleDelaisChange(index, 'delai', e.target.value)}
+                       />
+                     </Grid>
+                     <Grid item xs={1}>
+                       <IconButton onClick={() => removeDelaisItem(index)} color="error">
+                         <DeleteIcon />
+                       </IconButton>
+                     </Grid>
+                   </Grid>
+                 ))}
+                 <Button onClick={addDelaisItem} variant="outlined" startIcon={<AddIcon />}>
+                   Ajouter une étape
+                 </Button>
+               </Box>
 
-                <Box>
-                  <Typography variant="subtitle1" gutterBottom>Réserves</Typography>
-                  {config.reservesItems.map((item, index) => (
-                    <Grid container spacing={2} key={index} sx={{ mb: 2 }}>
-                      <Grid item xs={4}>
-                        <TextField
-                          fullWidth
-                          label="Type"
-                          value={item.type}
-                          onChange={(e) => handleReservesChange(index, 'type', e.target.value)}
-                        />
-                      </Grid>
-                      <Grid item xs={7}>
-                        <TextField
-                          fullWidth
-                          label="Description"
-                          value={item.description}
-                          onChange={(e) => handleReservesChange(index, 'description', e.target.value)}
-                        />
-                      </Grid>
-                      <Grid item xs={1}>
-                        <IconButton onClick={() => removeReservesItem(index)} color="error">
-                          <DeleteIcon />
-                        </IconButton>
-                      </Grid>
-                    </Grid>
-                  ))}
-                  <Button onClick={addReservesItem} variant="outlined" startIcon={<AddIcon />}>
-                    Ajouter une réserve
-                  </Button>
-                </Box>
-              </AccordionDetails>
-            </Accordion>
-          </Grid>
+               <Box>
+                 <Typography variant="subtitle1" gutterBottom>Réserves</Typography>
+                 {config.reservesItems.map((item, index) => (
+                   <Grid container spacing={2} key={index} sx={{ mb: 2 }}>
+                     <Grid item xs={4}>
+                       <TextField
+                         fullWidth
+                         label="Type"
+                         value={item.type}
+                         onChange={(e) => handleReservesChange(index, 'type', e.target.value)}
+                       />
+                     </Grid>
+                     <Grid item xs={7}>
+                       <TextField
+                         fullWidth
+                         label="Description"
+                         value={item.description}
+                         onChange={(e) => handleReservesChange(index, 'description', e.target.value)}
+                       />
+                     </Grid>
+                     <Grid item xs={1}>
+                       <IconButton onClick={() => removeReservesItem(index)} color="error">
+                         <DeleteIcon />
+                       </IconButton>
+                     </Grid>
+                   </Grid>
+                 ))}
+                 <Button onClick={addReservesItem} variant="outlined" startIcon={<AddIcon />}>
+                   Ajouter une réserve
+                 </Button>
+               </Box>
+             </AccordionDetails>
+           </Accordion>
+         </Grid>
 
-          {/* Conditions de réalisation */}
-          <Grid item xs={12}>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                <Typography variant="h6">Page 7 - Conditions de réalisation</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      label="MOQ"
-                      value={config.moq}
-                      onChange={(e) => handleInputChange('moq', e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      select
-                      label="Conditions de transport"
-                      value={config.transportConditions}
-                      onChange={(e) => handleInputChange('transportConditions', e.target.value)}
-                      SelectProps={{ native: true }}
-                    >
-                      <option value="port dû">port dû</option>
-                      <option value="franco">franco</option>
-                    </TextField>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Contrôle en série"
-                      value={config.seriesControl}
-                      onChange={(e) => handleInputChange('seriesControl', e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      fullWidth
-                      label="Emballage"
-                      value={config.packaging}
-                      onChange={(e) => handleInputChange('packaging', e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      label="Validité de l'offre"
-                      value={config.offerValidity}
-                      onChange={(e) => handleInputChange('offerValidity', e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      label="Nom du signataire"
-                      value={config.signerName}
-                      onChange={(e) => handleInputChange('signerName', e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      fullWidth
-                      label="Rôle du signataire"
-                      value={config.signerRole}
-                      onChange={(e) => handleInputChange('signerRole', e.target.value)}
-                    />
-                  </Grid>
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
-          </Grid>
-        </Grid>
-      </DialogContent>
-      
-      <DialogActions>
-        <Button onClick={onClose}>Annuler</Button>
-        <Button onClick={handleGenerate} variant="contained">
-          Générer le Rapport
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
+         {/* Conditions de réalisation */}
+         <Grid item xs={12}>
+           <Accordion>
+             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+               <Typography variant="h6">Page 7 - Conditions de réalisation</Typography>
+             </AccordionSummary>
+             <AccordionDetails>
+               <Grid container spacing={2}>
+                 <Grid item xs={6}>
+                   <TextField
+                     fullWidth
+                     label="MOQ"
+                     value={config.moq}
+                     onChange={(e) => handleInputChange('moq', e.target.value)}
+                   />
+                 </Grid>
+                 <Grid item xs={6}>
+                   <TextField
+                     fullWidth
+                     select
+                     label="Conditions de transport"
+                     value={config.transportConditions}
+                     onChange={(e) => handleInputChange('transportConditions', e.target.value)}
+                     SelectProps={{ native: true }}
+                   >
+                     <option value="port dû">port dû</option>
+                     <option value="franco">franco</option>
+                   </TextField>
+                 </Grid>
+                 <Grid item xs={12}>
+                   <TextField
+                     fullWidth
+                     label="Contrôle en série"
+                     value={config.seriesControl}
+                     onChange={(e) => handleInputChange('seriesControl', e.target.value)}
+                   />
+                 </Grid>
+                 <Grid item xs={12}>
+                   <TextField
+                     fullWidth
+                     label="Emballage"
+                     value={config.packaging}
+                     onChange={(e) => handleInputChange('packaging', e.target.value)}
+                   />
+                 </Grid>
+                 <Grid item xs={6}>
+                   <TextField
+                     fullWidth
+                     label="Validité de l'offre"
+                     value={config.offerValidity}
+                     onChange={(e) => handleInputChange('offerValidity', e.target.value)}
+                   />
+                 </Grid>
+                 <Grid item xs={6}>
+                   <TextField
+                     fullWidth
+                     label="Nom du signataire"
+                     value={config.signerName}
+                     onChange={(e) => handleInputChange('signerName', e.target.value)}
+                   />
+                 </Grid>
+                 <Grid item xs={6}>
+                   <TextField
+                     fullWidth
+                     label="Rôle du signataire"
+                     value={config.signerRole}
+                     onChange={(e) => handleInputChange('signerRole', e.target.value)}
+                   />
+                 </Grid>
+               </Grid>
+             </AccordionDetails>
+           </Accordion>
+         </Grid>
+       </Grid>
+     </DialogContent>
+     
+     <DialogActions>
+       <Button onClick={onClose}>Annuler</Button>
+       <Button onClick={handleGenerate} variant="contained">
+         Générer le Rapport
+       </Button>
+     </DialogActions>
+   </Dialog>
+ );
 };
 
 export default ReportConfigDialog;

@@ -42,6 +42,12 @@ export default function DocumentManager() {
   const [newDocName, setNewDocName] = useState('');
   const [newDocType, setNewDocType] = useState('caoutchouc');
   const [editDocName, setEditDocName] = useState('');
+  // Add client information fields
+  const [clientName, setClientName] = useState('');
+  const [clientCompany, setClientCompany] = useState('');
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   
@@ -76,7 +82,12 @@ export default function DocumentManager() {
     const requestBody = { 
       id: newDocId.trim(), 
       name: newDocName.trim(),
-      type: newDocType
+      type: newDocType,
+      clientName: clientName.trim(),
+      clientCompany: clientCompany.trim(),
+      contactName: contactName.trim(),
+      contactEmail: contactEmail.trim(),
+      contactPhone: contactPhone.trim()
     };
 
     console.log('Request body:', requestBody); // Debug log
@@ -93,9 +104,15 @@ export default function DocumentManager() {
 
       if (response.ok) {
         setCreateDialogOpen(false);
+        // Reset all form fields
         setNewDocId('');
         setNewDocName('');
         setNewDocType('caoutchouc');
+        setClientName('');
+        setClientCompany('');
+        setContactName('');
+        setContactEmail('');
+        setContactPhone('');
         setError('');
         fetchDocuments();
         // Navigate to the new document
@@ -267,9 +284,16 @@ export default function DocumentManager() {
                   <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                     ID: {doc.id}
                   </Typography>
-                  <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
-                    Type: {doc.type} {/* Add this debug line */}
-                  </Typography>
+                  {doc.clientName && (
+                    <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                      Client: {doc.clientName}
+                    </Typography>
+                  )}
+                  {doc.clientCompany && (
+                    <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+                      Société: {doc.clientCompany}
+                    </Typography>
+                  )}
                   <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
                     Créé: {new Date(doc.createdAt).toLocaleDateString('fr-FR')}
                   </Typography>
@@ -334,49 +358,92 @@ export default function DocumentManager() {
         </Box>
       )}
 
-      <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="sm" fullWidth>
+      <Dialog open={createDialogOpen} onClose={() => setCreateDialogOpen(false)} maxWidth="md" fullWidth>
         <DialogTitle>Créer un Nouveau Document</DialogTitle>
         <DialogContent>
-          <FormControl fullWidth sx={{ mb: 2, mt: 1 }}>
-            <InputLabel>Type de document</InputLabel>
-            <Select
-              value={newDocType}
-              onChange={(e) => {
-                console.log('Type changed to:', e.target.value); // Debug log
-                setNewDocType(e.target.value);
-              }}
-              label="Type de document"
-            >
-              {Object.entries(DOCUMENT_TYPES).map(([key, type]) => (
-                <MenuItem key={key} value={key}>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    {type.icon}
-                    {type.label}
-                  </Box>
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="ID du Document"
-            fullWidth
-            variant="outlined"
-            value={newDocId}
-            onChange={(e) => setNewDocId(e.target.value)}
-            helperText="Identifiant unique (ex: PROJ-001, CLIENT-ABC)"
-            sx={{ mb: 2 }}
-          />
-          <TextField
-            margin="dense"
-            label="Nom du Document"
-            fullWidth
-            variant="outlined"
-            value={newDocName}
-            onChange={(e) => setNewDocName(e.target.value)}
-            helperText="Nom descriptif du projet"
-          />
+          <Grid container spacing={2} sx={{ mt: 1 }}>
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <InputLabel>Type de document</InputLabel>
+                <Select
+                  value={newDocType}
+                  onChange={(e) => {
+                    console.log('Type changed to:', e.target.value); // Debug log
+                    setNewDocType(e.target.value);
+                  }}
+                  label="Type de document"
+                >
+                  {Object.entries(DOCUMENT_TYPES).map(([key, type]) => (
+                    <MenuItem key={key} value={key}>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        {type.icon}
+                        {type.label}
+                      </Box>
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                label="ID du Document"
+                value={newDocId}
+                onChange={(e) => setNewDocId(e.target.value)}
+                helperText="Identifiant unique (ex: PROJ-001, CLIENT-ABC)"
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                label="Nom du Document"
+                value={newDocName}
+                onChange={(e) => setNewDocName(e.target.value)}
+                helperText="Nom descriptif du projet"
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                label="Nom du client"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                label="Société du client"
+                value={clientCompany}
+                onChange={(e) => setClientCompany(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                label="Nom du contact"
+                value={contactName}
+                onChange={(e) => setContactName(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                label="Email du contact"
+                type="email"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                label="Téléphone du contact"
+                value={contactPhone}
+                onChange={(e) => setContactPhone(e.target.value)}
+              />
+            </Grid>
+          </Grid>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setCreateDialogOpen(false)}>Annuler</Button>
