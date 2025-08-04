@@ -5,7 +5,7 @@
       "name": "test plastic",
       "type": "plastique",
       "createdAt": "2025-07-04T11:47:21.765Z",
-      "updatedAt": "2025-08-04T20:46:22.725Z",
+      "updatedAt": "2025-08-04T22:34:02.654Z",
       "valueColumns": 1,
       "columnNames": [
         "Valeur 1"
@@ -171,7 +171,7 @@
       "contactEmail": "mr.tamimi.mohammed@gmail.com",
       "contactPhone": "0763431996",
       "createdAt": "2025-08-04T19:54:03.920Z",
-      "updatedAt": "2025-08-04T20:46:27.258Z",
+      "updatedAt": "2025-08-04T20:52:12.911Z",
       "valueColumns": 1,
       "columnNames": [
         "Valeur 1"
@@ -508,6 +508,166 @@
             "MARGE SUR COUT DIRECT / AN": "0.00",
             "QUANTITE DE MATIERE PREVISIONNEL": "0.00",
             "CHARGE MACHINE": ""
+          }
+        }
+      }
+    },
+    "22222222": {
+      "id": "22222222",
+      "name": "2222",
+      "type": "plastique",
+      "clientName": "2222",
+      "clientCompany": "2222",
+      "contactName": "2222",
+      "contactEmail": "2222",
+      "contactPhone": "2222",
+      "createdAt": "2025-08-04T22:34:20.874Z",
+      "updatedAt": "2025-08-04T22:34:22.979Z",
+      "valueColumns": 1,
+      "columnNames": [
+        "Valeur 1"
+      ],
+      "data": {
+        "0": {
+          "matiere": {
+            "Matière": "",
+            "Désignation": "",
+            "Référence Squalp": "",
+            "Prix Matière (€/kg)": "",
+            "Taux de colorant (%)": "",
+            "Prix Colorant (€/kg)": "",
+            "Volume (cm3)": "",
+            "Densité (gr/cm3)": "",
+            "Poids pièce (gr)": "0.00",
+            "Poids carotte de la moulée (gr)": "",
+            "Poids carotte/ pièce (gr)": "0.00",
+            "% du masse carotte / masse pièce": "",
+            "% de recyclage carotte integrer": "",
+            "% du masse carotte / masse pièce apres recyclage (< 15%)": "",
+            "Poids carotte/ pièce (gr)_2": "0.00",
+            "Poids purge nettoyage lancement série (gr)": "",
+            "Quantité rebuts/lancement": "",
+            "Poids rebuts (gr)": "0.00",
+            "Poids purge (g)": "0.00",
+            "Poids Nomenclature SQUALP": "0.00",
+            "Pour info cout carotte (€):": "0.00",
+            "COUT MATIERE PAR PIECE": "0.00"
+          },
+          "inserts": {
+            "Référence Squalp": "",
+            "Coût insert": "",
+            "Nombre d'insert par pièce": "",
+            "Contrôle insert": "",
+            "Quantité d'inserts lancement": "0",
+            "Quantité inserts rebuts production": "0",
+            "Quantité totale inserts": "0",
+            "COUT INSERTS PAR PIECE": "0.00"
+          },
+          "conditionnement": {
+            "Référence Squalp": "",
+            "Longueur pièce (en X)": "",
+            "Largeur pièce (en Y)": "",
+            "Hauteur pièce (en Z)": "",
+            "Nbre de pièce en Longueur": "",
+            "Nbre de pièce en Largeur": "",
+            "Nbre de pièce en Hauteur": "",
+            "Volume (cm3)": "0.00",
+            "Quantité de pièce par conditionnement": "0",
+            "Coût du conditionnement (carton, sachet)": "",
+            "Coût palette": "",
+            "Nombre de conditionnement par palette": "",
+            "COUT CONDITIONNEMENT PAR PIECE": "0.00"
+          },
+          "autresAchats": {
+            "SOUS-TRAITANCE…": ""
+          },
+          "totalAchats": {
+            "COÛTS TOTAL ACHAT": "0.00",
+            "% ACHAT/CA": ""
+          },
+          "lancementMoulage": {
+            "SERIE DE PIECES": "",
+            "TYPE DE PRESSE": "",
+            "PREPARATION AU POSTE": "",
+            "PREPARATION MATIERE": "",
+            "NETTOYAGE TREMIE (HORS PRESSE)": "",
+            "PREPARATION & STOCKAGE MOULE (HORS PRESSE) (MIN)": "",
+            "MONTAGE & DEMONTAGE (MIN) - MONTEUR OUTILLAGE": "",
+            "LANCEMENT (MIN) - REGLEUR": "",
+            "COUT LANCEMENT TOTAL": "0.00",
+            "COUT LANCEMENT/PIECE": "0.00"
+          },
+          "moulage": {
+            "TPS DE CYCLE (sec)": "",
+            "NOMBRE D'EMPREINTES": "",
+            "MOULAGE AUTO : 25% ; SEMI-AUTO : 100%": "",
+            "% DE REBUT MOULAGE": "",
+            "QUANTITE DE PIECE PAR EQUIPE": "",
+            "Nombre d'équipe pour la série": "",
+            "COÛT MOULAGE/PIECE": "",
+            "Total moulage": "0.000"
+          },
+          "finition": {
+            "Série de pièces à traiter": "",
+            "Temps prépration poste (min)": "",
+            "Ressource lancement": "",
+            "Côuts horaire équipement": "",
+            "Coût lancement ramené à la pièce": "0.00",
+            "Ressource production": "",
+            "Temps par pièce (s)": "",
+            "Coûts opération par pièce": "0.00",
+            "COUT FINITION PAR PIECE": "0.00"
+          },
+          "controleCapa": {
+            "Contrôle lancement (qté)": "",
+            "Ressource lancement": "",
+            "Temps par pièce (sec)": "",
+            "Coût lancement (€)": "0.00",
+            "Contrôle série (qté)": "1",
+            "Ressource production": "",
+            "Coûts contrôle série (€)": "0.00",
+            "COUT CONTRÔLE PAR PIECE": "0.00"
+          },
+          "embalage": {
+            "Série de pièces à traiter": "",
+            "Temps prépration poste (min)": "",
+            "Ressource lancement": "",
+            "Côuts horaire équipement": "",
+            "Coût lancement ramené à la pièce": "0.00",
+            "Ressource production": "",
+            "Temps par pièce (s)": "",
+            "Coûts opération par pièce": "0.00",
+            "COUT FINITION PAR PIECE": "0.00"
+          },
+          "autre": {
+            "Série de pièces à traiter": "",
+            "Temps prépration poste (min)": "",
+            "Ressource lancement": "",
+            "Côuts horaire équipement": "",
+            "Coût lancement ramené à la pièce": "0.00",
+            "Ressource production": "",
+            "Temps par pièce (s)": "",
+            "Coûts opération par pièce": "0.00",
+            "COUT FINITION PAR PIECE": "0.00"
+          },
+          "totalVA": {
+            "TOTAL VA": "0.000",
+            "PRI PIECE COUTS COMPLET": "0.00",
+            "PRI PIECE COUTS DIRECT": "",
+            "TAUX DE MARGE (PV/PRI coûts complet)": "",
+            "PRIX DE VENTE": "0.000",
+            "Option: PORT (Base de prix 35€ / palette)": "35.00",
+            "MARGE SUR COUTS DIRECTS €": "0.00",
+            "MARGE SUR COUTS DIRECTS %": ""
+          },
+          "synthese": {
+            "QUANTITE ANNUELLE": "",
+            "NOMBRE D'EQUIPES ANNUEL": "0",
+            "CHIFFRE D'AFFAIRE PREVISIONNEL": "0",
+            "MARGE SUR COUT COMPLET / AN": "0",
+            "MARGE SUR COUT DIRECT / AN": "0",
+            "QUANTITE DE MATIERE PREVISIONNEL": "0",
+            "CHARGE MACHINE": "0.00"
           }
         }
       }
