@@ -51,6 +51,11 @@ app.get('/api/documents', async (req, res) => {
         id,
         name: doc.name,
         type: finalType,
+        clientName: doc.clientName || '',
+        clientCompany: doc.clientCompany || '',
+        contactName: doc.contactName || '',
+        contactEmail: doc.contactEmail || '',
+        contactPhone: doc.contactPhone || '',
         createdAt: doc.createdAt,
         updatedAt: doc.updatedAt
       };
@@ -93,9 +98,18 @@ app.post('/api/documents', async (req, res) => {
     console.log('=== CREATING NEW DOCUMENT ===');
     console.log('Received request body:', req.body);
     
-    const { id, name, type = 'caoutchouc' } = req.body;
+    const { 
+      id, 
+      name, 
+      type = 'caoutchouc', 
+      clientName = '', 
+      clientCompany = '', 
+      contactName = '', 
+      contactEmail = '', 
+      contactPhone = '' 
+    } = req.body;
     
-    console.log('Extracted values:', { id, name, type });
+    console.log('Extracted values:', { id, name, type, clientName, clientCompany, contactName, contactEmail, contactPhone });
     console.log('typeof type:', typeof type);
     
     if (!id || !name) {
@@ -111,7 +125,12 @@ app.post('/api/documents', async (req, res) => {
     const newDocument = {
       id,
       name,
-      type, // This should be the type from the request
+      type,
+      clientName,
+      clientCompany,
+      contactName,
+      contactEmail,
+      contactPhone,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       valueColumns: 1,
