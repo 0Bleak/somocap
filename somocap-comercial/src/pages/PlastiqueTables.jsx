@@ -18,7 +18,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import FolderIcon from '@mui/icons-material/Folder';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
-import { TABLES } from '../constants/plastique';
+import { TABLES } from '../constants/plastique.jsx';
 import { isCalculated, getCalculation } from '../utils/plastique/calculations';
 import { generateWordReport, downloadBlob } from '../utils/plastique/wordExport';
 import { complets, directs, cout_machine } from '../utils/plastique/variables';

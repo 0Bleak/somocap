@@ -88,7 +88,7 @@ const DROPDOWN_OPTIONS = {
     ],
     'Ressource production': [
       { label: 'regleur', value: complets.coutHoraire.regleur },
-      { label: 'operateur', value: complets.coutHoraire.operateur },
+ { label: 'operateur', value: complets.coutHoraire.operateur },
      { label: 'finition', value: complets.coutHoraire.finition }
    ]
  },
